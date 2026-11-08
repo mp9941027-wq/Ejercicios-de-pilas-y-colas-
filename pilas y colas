@@ -1,0 +1,220 @@
+//Ejercicio 1
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class Palindromo {
+
+    // Determina si una cadena es palindromo usando una pila y una cola.
+     //Se ignoran espacios, puntuacion y mayusculas/minusculas.
+     
+    public static boolean esPalindromo(String texto) {
+        if (texto == null) return false;
+
+        // Normalizar: solo letras y digitos, en minusculas
+        String limpio = texto.toLowerCase().replaceAll("[^a-z0-9áéíóúñ]", "");
+        if (limpio.isEmpty()) return true;
+
+        Pila<Character> pila = new Pila<>();
+        Queue<Character> cola = new LinkedList<>();
+
+        for (char c : limpio.toCharArray()) {
+            pila.push(c);   // LIFO: invierte
+            cola.offer(c);  // FIFO: orden original
+        }
+
+        while (!pila.isEmpty() && !cola.isEmpty()) {
+            if (!pila.pop().equals(cola.poll())) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        ejercicio1Palindromo();
+    }
+
+    //  EJERCICIO 1 
+    private static void ejercicio1Palindromo() {
+        System.out.println("========= EJERCICIO 1: PALINDROMO =========");
+        String[] pruebas = {
+                "Anita lava la tina",
+                "Hola mundo",
+                "A man, a plan, a canal: Panama",
+                "12321",
+                "Java",
+                "¡Anita, lava la tina!",
+                ""
+        };
+        for (String s : pruebas) {
+            System.out.printf("\"%-35s\" -> %s%n", s,
+                    Palindromo.esPalindromo(s) ? "SI" : "NO");
+        }
+    }
+}
+
+  // Ejercicio 2 
+public class Pedido {
+    private final String id;
+    private final String producto;
+    private final int cantidad;
+    private final boolean vip;
+
+    public Pedido(String id, String producto, int cantidad, boolean vip) {
+        this.id = id;
+        this.producto = producto;
+        this.cantidad = cantidad;
+        this.vip = vip;
+    }
+
+    public String getId() { 
+     return id;
+    }
+    public String getProducto() {
+     return producto;
+    }
+    public int getCantidad() {
+      return cantidad; 
+    }
+    public boolean isVip() {
+      return vip;
+    }
+
+    @Override
+    public String toString() {
+        return "Pedido[" + id + "] " + producto + " x" + cantidad
+                + (vip ? " (VIP)" : "");
+    }
+}
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+public class Tienda {
+
+    private final Queue<Pedido> colaVip    = new LinkedList<>();
+    private final Queue<Pedido> colaNormal = new LinkedList<>();
+    private final List<Pedido> historial   = new ArrayList<>();
+
+    // Agregar pedido a la cola que le corresponde
+    public void agregarPedido(Pedido p) {
+        if (p.isVip()) {
+            colaVip.offer(p);
+            System.out.println("  -> Pedido VIP " + p.getId() + " agregado a la cola VIP");
+        } else {
+            colaNormal.offer(p);
+            System.out.println("  -> Pedido " + p.getId() + " agregado a la cola normal");
+        }
+    }
+
+    //  Procesar siguiente (VIP primero)
+    public void procesarPedido() {
+        Pedido p;
+        if (!colaVip.isEmpty()) {
+            p = colaVip.poll();
+            System.out.println("  >> Procesando VIP: " + p);
+        } else if (!colaNormal.isEmpty()) {
+            p = colaNormal.poll();
+            System.out.println("  >> Procesando: " + p);
+        } else {
+            System.out.println("  >> No hay pedidos pendientes");
+            return;
+        }
+        historial.add(p);
+    }
+
+    // Cancelar un pedido por identificador
+    public void cancelarPedido(String id) {
+        if (eliminarDe(colaVip, id)) {
+            System.out.println("  -- Pedido VIP " + id + " cancelado");
+            return;
+        }
+        if (eliminarDe(colaNormal, id)) {
+            System.out.println("  -- Pedido " + id + " cancelado");
+            return;
+        }
+        System.out.println("  -- No se encontro pedido con id " + id);
+    }
+
+    private boolean eliminarDe(Queue<Pedido> cola, String id) {
+        Iterator<Pedido> it = cola.iterator();
+        while (it.hasNext()) {
+            if (it.next().getId().equals(id)) {
+                it.remove();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Mostrar pedidos pendientes (ambas colas)
+    public void pedidosPendientes() {
+        System.out.println("  Cola VIP    (" + colaVip.size() + "):");
+        if (colaVip.isEmpty()) System.out.println("     (vacia)");
+        else colaVip.forEach(p -> System.out.println("     " + p));
+
+        System.out.println("  Cola Normal (" + colaNormal.size() + "):");
+        if (colaNormal.isEmpty()) System.out.println("     (vacia)");
+        else colaNormal.forEach(p -> System.out.println("     " + p));
+    }
+
+    //  Historial de pedidos procesados
+    public void mostrarHistorial() {
+        System.out.println("  Historial (" + historial.size() + " pedidos procesados):");
+        if (historial.isEmpty()) System.out.println("     (vacio)");
+        else historial.forEach(p -> System.out.println("     " + p));
+    }
+}
+public class Main {
+
+    public static void main(String[] args) {
+       ejercicio2Tienda();
+
+       //  EJERCICIO 2 
+      private static void ejercicio2Tienda(){
+        System.out.println("\n========= EJERCICIO 2: TIENDA =========");
+        Tienda tienda = new Tienda();
+
+        System.out.println("-- Agregando pedidos --");
+        tienda.agregarPedido(new Pedido("P001", "Laptop",  1, false));
+        tienda.agregarPedido(new Pedido("P002", "Mouse",   2, false));
+        tienda.agregarPedido(new Pedido("P003", "Monitor", 1, true));   // VIP
+        tienda.agregarPedido(new Pedido("P004", "Teclado", 3, false));
+        tienda.agregarPedido(new Pedido("P005", "Tablet",  1, true));   // VIP
+
+        System.out.println("\n-- Pendientes --");
+        tienda.pedidosPendientes();
+
+        System.out.println("\n-- Procesando 2 pedidos (debería salir VIP primero) --");
+        tienda.procesarPedido();
+        tienda.procesarPedido();
+
+        System.out.println("\n-- Cancelando P004 --");
+        tienda.cancelarPedido("P004");
+
+        System.out.println("\n-- Cancelando inexistente P999 --");
+        tienda.cancelarPedido("P999");
+
+        System.out.println("\n-- Pendientes tras cambios --");
+        tienda.pedidosPendientes();
+
+        System.out.println("\n-- Procesando el resto --");
+        while (true) {
+            break;
+        }
+          tienda.procesarPedido();
+          tienda.procesarPedido();
+          tienda.procesarPedido();
+
+          System.out.println("\n-- Historial --");
+           tienda.mostrarHistorial();
+     }
+  }
+} 
+
