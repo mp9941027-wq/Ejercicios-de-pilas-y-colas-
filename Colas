@@ -1,0 +1,430 @@
+// Ejercicio 1
+public class Cliente {
+    private final String nombre;
+    private final int ticket;
+
+    public Cliente(String nombre, int ticket) {
+        this.nombre = nombre;
+        this.ticket = ticket;
+    }
+
+    public String getNombre() { return nombre; }
+    public int getTicket()    { return ticket; }
+
+    @Override
+    public String toString() {
+        return "Ticket #" + ticket + " - " + nombre;
+    }
+}
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class SistemaAtencion {
+
+    private final Queue<Cliente> fila = new LinkedList<>();
+    private int contadorTicket = 1;
+
+    // a) Registrar clientes en la fila
+    public void registrarClientes(String[] nombres) {
+        for (String nombre : nombres) {
+            fila.offer(new Cliente(nombre, contadorTicket++));
+        }
+        System.out.println("\n--- Fila de clientes registrados ---");
+        if (fila.isEmpty()) {
+            System.out.println("(La fila está vacía)");
+        } else {
+            for (Cliente c : fila) {
+                System.out.println("  " + c);
+            }
+        }
+    }
+
+    // b) Atender al siguiente cliente
+    public void atenderSiguiente() {
+        Cliente c = fila.poll();
+        if (c == null) {
+            System.out.println("La fila está vacía. No hay clientes por atender.");
+        } else {
+            System.out.println("Atendiendo a -> " + c);
+        }
+    }
+
+    // c) Verificar el próximo cliente sin atenderlo
+    public void verProximo() {
+        Cliente c = fila.peek();
+        if (c == null) {
+            System.out.println("La fila está vacía. No hay próximo cliente.");
+        } else {
+            System.out.println("Próximo cliente en la fila -> " + c);
+        }
+    }
+
+    // d) Simular el cierre del día
+    public void cierreDelDia() {
+        System.out.println("\n--- Cierre del día: atendiendo a todos ---");
+        if (fila.isEmpty()) {
+            System.out.println("No hay clientes pendientes.");
+            return;
+        }
+        while (!fila.isEmpty()) {
+            Cliente c = fila.poll();
+            System.out.println("Atendido: " + c);
+        }
+        System.out.println(fila.isEmpty()
+                ? "La fila quedó vacía correctamente."
+                : "ERROR: aún quedan clientes.");
+    }
+
+    // e) Revisar cantidad de clientes pendientes
+    public int contarPendientes() {
+        return contarPendientes(fila);
+    }
+
+    // Versión que recorre la cola sin eliminarla (sin usar size())
+    public static int contarPendientes(Queue<Cliente> cola) {
+        int contador = 0;
+        for (Cliente c : cola) { // iterar NO elimina
+            contador++;
+        }
+        return contador;
+    }
+
+    public Queue<Cliente> getFila() { return fila; }
+
+}
+
+
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class SistemaAtencion {
+    private final Queue<Cliente> fila = new LinkedList<>();
+    private int contadorTicket = 1 ;
+
+    // registrar clientes en  fila 
+    public void registrarClientes(String[] nombres){
+        for(String nombre : nombres){
+            fila.offer(new Cliente(nombre,contadorTicket++));
+        }
+        System.out.println("\n Fila de clientes registrados");
+        if(fila.isEmpty()){
+            System.out.println("(La fila esta vacia)");
+        }else{
+            for(Cliente c : fila){
+                System.out.println(" " + c);
+            }
+        }
+    }
+     // atender al siguiente cliente 
+     public void atenderSiguiente(){
+        Cliente c = fila.poll();
+        if(c == null){
+            System.out.println("La fila esta vacia .No hay clientes por atender ");
+        }else{
+            System.out.println("Atendiend a ->" + c);
+        }
+     }
+
+     // verificar el proximo cliente sin atender
+     public void verPoximo(){
+        Cliente c = fila.peek();
+        if(c == null){
+            System.out.println("La fila esta vacia, no hay prxim cliente");
+        }else{
+            System.out.println("Proximo cliente en la fila ->" + c);
+        }
+     }
+    
+     // simular el cierre  del dia 
+     public void cierreDelDia() {
+        System.out.println("\n Cierre del dia: atendiendo a todos ");
+        if (fila.isEmpty()) {
+            System.out.println("No hay clientes pendientes.");
+            return;
+        }
+        while (!fila.isEmpty()) {
+            Cliente c = fila.poll();
+            System.out.println("Atendido: " + c);
+        }
+        System.out.println(fila.isEmpty()
+                ? "La fila quedo vacia correctamente."
+                : "ERROR: aun quedan clientes.");
+    }
+
+     //  revisar cantidad de clientes pendientes
+     public int contarPendientes() {
+        return contarPendientes(fila);
+    }
+
+    // version que recorre la cola sin eliminarla )
+    public static int contarPendientes(Queue<Cliente> cola) {
+        int contador = 0;
+        for (Cliente c : cola) { 
+
+            contador++;
+        }
+        return contador;
+    }
+
+    public Queue<Cliente> getFila() { return fila; }
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        // Ejercicio 1: Clientes 
+        System.out.println("EJERCICIO 1: CLIENTES ");
+        SistemaAtencion sistema = new SistemaAtencion();
+
+        sistema.registrarClientes(new String[]{"Ana", "Luis", "María", "Pedro"});
+        sistema.verProximo();
+        sistema.atenderSiguiente();
+        System.out.println("Clientes pendientes: " + sistema.contarPendientes());
+        sistema.cierreDelDia();
+        System.out.println("Clientes pendientes al final: " + sistema.contarPendientes());
+    }
+ }
+}
+
+ // Ejercicio 2
+
+public class Pedido {
+    private final String id;
+
+    public Pedido(String id) { this.id = id; }
+
+    public String getId() { return id; }
+
+    @Override
+    public String toString() { return "Pedido[" + id + "]"; }
+}
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+public class ColaPedido {
+
+    private final Queue<Pedido> cola = new LinkedList<>();
+
+    //  agregar pedidos a la cola
+    public void agregarPedidos(List<String> ids) {
+        for (String id : ids) {
+            cola.offer(new Pedido(id));
+        }
+        System.out.println("\n--- Pedidos agregados a la cola ---");
+        mostrarContenido();
+    }
+
+    public void mostrarContenido() {
+        if (cola.isEmpty()) {
+            System.out.println("(Cola vacia)");
+            return;
+        }
+        for (Pedido p : cola) {
+            System.out.println("  " + p);
+        }
+    }
+
+    // procesar el siguiente pedido
+    public Pedido procesarSiguiente() {
+        Pedido p = cola.poll();
+        if (p == null) {
+            System.out.println("No hay pedidos pendientes.");
+        } else {
+            System.out.println("Pedido procesado -> " + p);
+        }
+        return p;
+    }
+
+    // mostrar el siguiente pedido sin procesarlo
+    public Pedido verSiguiente() {
+        Pedido p = cola.peek();
+        if (p == null) {
+            System.out.println("No hay pedidos pendientes.");
+        } else {
+            System.out.println("Siguiente pedido (sin procesar) -> " + p);
+        }
+        return p;
+    }
+
+    // procesar todos los pedidos
+    public void procesarTodos() {
+        System.out.println("\n--- Procesando todos los pedidos ---");
+        if (cola.isEmpty()) {
+            System.out.println("No hay pedidos pendientes.");
+            return;
+        }
+        while (!cola.isEmpty()) {
+            System.out.println("Procesado: " + cola.poll());
+        }
+        System.out.println(cola.isEmpty()
+                ? "La cola quedo vacia."
+                : "ERROR: aun quedan pedidos.");
+    }
+
+    // contar pedidos pendientes (sin eliminar)
+    public static int contarPendientes(Queue<Pedido> cola) {
+        int contador = 0;
+        for (Pedido p : cola) {
+            contador++;
+        }
+        return contador;
+    }
+
+    public int contarPendientes() {
+        return contarPendientes(cola);
+    }
+
+    public Queue<Pedido> getCola() { return cola; }
+}
+
+import util.Arrays;
+  import util.List;
+
+  public class Main{
+    public static void main(String[]  args){
+
+      System.out.println("\n EJERCICIO 2: PEDIDOS ");
+  ColaPedidos pedidos = new ColaPedidos();
+
+  pedidos.agregarPedidos(Arrays.asList("PED001", "PED002", "PED003", "PED004"));
+  pedidos.verSiguiente();
+  pedidos.procesarSiguiente();
+  System.out.println("Pedidos pendientes: "
+          + ColaPedidos.contarPendientes(pedidos.getCola()));
+  pedidos.procesarTodos();
+  System.out.println("Pedidos pendientes al final: "
+          + ColaPedidos.contarPendientes(pedidos.getCola()));
+}
+
+//Ejercicio 3
+public class Impresion {
+    private final String archivo;
+    private final int paginas;
+
+    public Impresion(String archivo, int paginas) {
+        this.archivo = archivo;
+        this.paginas = paginas;
+    }
+
+    public String getArchivo() { return archivo; }
+    public int getPaginas()    { return paginas; }
+
+    @Override
+    public String toString() {
+        return "Archivo: " + archivo + " (" + paginas + " paginas)";
+    }
+}
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+public class ColaImpresion {
+
+    private final Queue<Impresion> cola = new LinkedList<>();
+
+    // agregar tareas de impresion
+    public void agregarTareas(List<Impresion> tareas) {
+        for (Impresion t : tareas) {
+            cola.offer(t);
+        }
+        System.out.println("\n--- Tareas agregadas a la cola de impresion ---");
+        mostrarContenido();
+    }
+
+    public void mostrarContenido() {
+        if (cola.isEmpty()) {
+            System.out.println("(Cola de impresion vacia)");
+            return;
+        }
+        for (Impresion t : cola) {
+            System.out.println("  " + t);
+        }
+    }
+
+    // procesar la siguiente tarea
+    public Impresion procesarSiguiente() {
+        Impresion t = cola.poll();
+        if (t == null) {
+            System.out.println("No hay tareas pendientes en la cola de impresión.");
+        } else {
+            System.out.println("Imprimiendo -> " + t.getArchivo()
+                    + " (" + t.getPaginas() + " paginas)");
+        }
+        return t;
+    }
+
+    // mostrar la proxima tarea sin procesarla
+    public Impresion verProxima() {
+        Impresion t = cola.peek();
+        if (t == null) {
+            System.out.println("No hay tareas pendientes en la cola de impresión.");
+        } else {
+            System.out.println("Proxima tarea (sin procesar) -> " + t);
+        }
+        return t;
+    }
+
+    // simular la impresion de todas las tareas
+    public void imprimirTodas() {
+        System.out.println("\n--- Imprimiendo todas las tareas ---");
+        if (cola.isEmpty()) {
+            System.out.println("No hay tareas pendientes.");
+            return;
+        }
+        while (!cola.isEmpty()) {
+            Impresion t = cola.poll();
+            System.out.println("Impreso: " + t.getArchivo()
+                    + " (" + t.getPaginas() + " paginas)");
+        }
+        System.out.println(cola.isEmpty()
+                ? "La cola de impresion quedo vacia."
+                : "ERROR: aun quedan tareas.");
+    }
+
+    // calcular total de paginas pendientes (sin eliminar)
+    public int totalPaginasPendientes() {
+        int total = 0;
+        for (Impresion t : cola) { 
+            total += t.getPaginas();
+        }
+        return total;
+    }
+
+    public Queue<Impresion> getCola() { return cola; }
+}
+
+
+import java.util.Arrays;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+ 
+ System.out.println("\n EJERCICIO 3: IMPRESIÓN ");
+ ColaImpresion impresion = new ColaImpresion();
+
+ List<Impresion> tareas = Arrays.asList(
+         new Impresion("informe.pdf", 12),
+         new Impresion("contrato.docx", 5),
+         new Impresion("tesis.pdf", 120),
+         new Impresion("factura.xlsx", 2));
+
+ impresion.agregarTareas(tareas);
+ impresion.verProxima();
+ impresion.procesarSiguiente();
+ System.out.println("Total de páginas pendientes: "
+         + impresion.totalPaginasPendientes());
+ impresion.imprimirTodas();
+ System.out.println("Total de páginas pendientes al final: "
+         + impresion.totalPaginasPendientes());
+}
+}
+
+
+
+
