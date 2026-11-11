@@ -1,0 +1,224 @@
+// Ejercicio 1
+import java.util.ArrayList;
+import java.util.List;
+
+// Implementacion simple de una Pila (LIFO) con los metodos pedidos:
+
+public class Pila<T> {
+
+    private final List<T> elementos = new ArrayList<>();
+
+    // Apila un elemento en el tope.
+    public void push(T elemento) {
+        elementos.add(elemento);
+    }
+
+    // Devuelve el elemento del tope sin eliminarlo.
+    public T top() {
+        if (isEmpty()) {
+            throw new IllegalStateException("La pila esta vacia (top)");
+        }
+        return elementos.get(elementos.size() - 1);
+    }
+
+    // Elimina y devuelve el elemento del tope. 
+    public T pop() {
+        if (isEmpty()) {
+            throw new IllegalStateException("La pila está vacía (pop)");
+        }
+        return elementos.remove(elementos.size() - 1);
+    }
+
+    // true si la pila no tiene elementos. 
+    public boolean isEmpty() {
+        return elementos.isEmpty();
+    }
+
+    // Cantidad de elementos actuales. 
+    public int size() {
+        return elementos.size();
+    }
+}
+
+public class ValidadorParentesis {
+
+    // Determina si la secuencia de parentesis (), [] y {} es valida.
+      //Ignora cualquier otro caracter.
+     
+    public static boolean esValida(String cadena) {
+        if (cadena == null) return false;
+
+        Pila<Character> pila = new Pila<>();
+
+        for (char c : cadena.toCharArray()) {
+            if (c == '(' || c == '[' || c == '{') {
+                pila.push(c);
+            } else if (c == ')' || c == ']' || c == '}') {
+                if (pila.isEmpty()) return false;         // cierre sin apertura
+                char apertura = pila.pop();
+                if (!coincide(apertura, c)) return false; // tipo incorrecto
+            }
+        }
+        return pila.isEmpty(); // valido solo si no quedaron aperturas sin cerrar
+    }
+
+    private static boolean coincide(char apertura, char cierre) {
+        return (apertura == '(' && cierre == ')')
+            || (apertura == '[' && cierre == ']')
+            || (apertura == '{' && cierre == '}');
+    }
+}
+
+public class InvertirCadena {
+
+    // Invierte el orden de los caracteres de una cadena usando una pila.
+    
+    public static String invertir(String cadena) {
+        if (cadena == null) return null;
+
+        Pila<Character> pila = new Pila<>();
+
+        // Apilamos cada caracter
+        for (char c : cadena.toCharArray()) {
+            pila.push(c);
+        }
+
+        // Desapilamos para reconstruir en orden inverso
+        StringBuilder sb = new StringBuilder(cadena.length());
+        while (!pila.isEmpty()) {
+            sb.append(pila.pop());
+        }
+        return sb.toString();
+    }
+}
+
+public class EvaluadorPostfijo {
+    // Evalua una expresion en notacion postfija (RPN).
+     // Soporta sumas, restas, multiplicaciones y divisiones.
+     //Los operandos pueden ser enteros o decimales.
+    
+    public static double evaluar(String expresion) {
+        if (expresion == null || expresion.trim().isEmpty()) {
+            throw new IllegalArgumentException("La expresión está vacía");
+        }
+
+        Pila<Double> pila = new Pila<>();
+        String[] tokens = expresion.trim().split("\\s+");
+
+        for (String token : tokens) {
+            if (esOperador(token)) {
+                if (pila.size() < 2) {
+                    throw new IllegalArgumentException(
+                            "Expresion invalida: operandos insuficientes para '" + token + "'");
+                }
+                double b = pila.pop();   // segundo operando
+                double a = pila.pop();   // primer operando
+                double resultado;
+                switch (token.charAt(0)) {
+                    case '+': resultado = a + b; break;
+                    case '-': resultado = a - b; break;
+                    case '*': resultado = a * b; break;
+                    case '/':
+                        if (b == 0) throw new ArithmeticException("Division por cero");
+                        resultado = a / b;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Operador desconocido: " + token);
+                }
+                pila.push(resultado);
+            } else {
+                pila.push(Double.parseDouble(token)); // operando numerico
+            }
+        }
+
+        if (pila.size() != 1) {
+            throw new IllegalArgumentException("Expresion invalida: sobran operandos");
+        }
+        return pila.pop();
+    }
+
+    private static boolean esOperador(String token) {
+        return token.length() == 1 && "+-*/".contains(token);
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+        demostrarOperacionesPila();
+        ejercicio1Invertir();
+        ejercicio2Parentesis();
+        ejercicio3Postfija();
+    }
+    private static void demostrarOperacionesPila() {
+        System.out.println("\ DEMOSTRACION DE LA PILA ");
+        Pila<String> pila = new Pila<>();
+        System.out.println("isEmpty() al inicio -> " + pila.isEmpty());
+
+        pila.push("A");
+        pila.push("B");
+        pila.push("C");
+        System.out.println("Despues de push A, B, C:");
+        System.out.println("  top() -> " + pila.top());
+        System.out.println("  pop() -> " + pila.pop());
+        System.out.println("  top() -> " + pila.top());
+        System.out.println("  isEmpty() -> " + pila.isEmpty());
+
+        pila.pop();
+        pila.pop();
+        System.out.println("  isEmpty() tras vaciar -> " + pila.isEmpty() + "\n");
+    }
+
+    // ---------- Ejercicio 1 ----------
+    private static void ejercicio1Invertir() {
+        System.out.println("EJERCICIO 1: INVERTIR CADENA");
+        String[] cadenas = {"Hola mundo!", "Java", "", "a" , "12345"};
+        for (String s : cadenas) {
+            System.out.println("Entrada : \"" + s + "\"");
+            System.out.println("Salida  : \"" + InvertirCadena.invertir(s) + "\"\n");
+        }
+    }
+
+    // ---------- Ejercicio 2 ----------
+    private static void ejercicio2Parentesis() {
+        System.out.println("EJERCICIO 2: VALIDAR PARENTESIS ");
+        String[] expresiones = {
+                "(a + b) * (c - d)",
+                "{{(a)}",
+                "{[()]}",
+                "((()))",
+                ")(",
+                "a + b",
+                "[(])"
+        };
+        for (String e : expresiones) {
+            System.out.println("Entrada : " + e);
+            System.out.println("Salida  : "
+                    + (ValidadorParentesis.esValida(e) ? "Valido" : "No válido") + "\n");
+        }
+    }
+
+   
+    private static void ejercicio3Postfija() {
+        System.out.println(" EJERCICIO 3: EVALUAR POSTFIJA ");
+        String[] postfijas = {
+                "2 3 + 5 *",           
+                "5 1 2 + 4 * + 3 -",   
+                "3 4 +",               
+                "10 2 /",              
+                "2 3 + 5 * 2 -"        
+        };
+        for (String p : postfijas) {
+            double r = EvaluadorPostfijo.evaluar(p);
+            System.out.println("Expresion : " + p);
+            System.out.println("Resultado : " + formatear(r) + "\n");
+        }
+    }
+
+    private static String formatear(double v) {
+        if (v == Math.floor(v) && !Double.isInfinite(v)) {
+            return String.valueOf((long) v);
+        }
+        return String.valueOf(v);
+    }
+}
